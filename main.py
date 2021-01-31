@@ -1,20 +1,26 @@
-import requests
+from flask import Flask, request
 import pickle
-from google.cloud import storage
+#from google.cloud import storage
 import numpy as np
+#from sklearn.linear_model import LogisticRegression
 
-storage_client = storage.Client()
-bucket = storage_client.get_bucket('model-bucket-iris-sn')
-blob = bucket.blob('flower-v1.pkl')
-blob.download_to_filename('/tmp/flower-v1.pkl')
-model_pk = pickle.load(open('/tmp/flower-v1.pkl', 'rb'))
+# storage_client = storage.Client()
+# bucket = storage_client.get_bucket('model-bucket-iris-sn')
+# blob = bucket.blob('flower-v1.pkl')
+# blob.download_to_filename('/tmp/flower-v1.pkl')
+model_pk = pickle.load(open('flower-v1.pkl', 'rb'))
 
-def api_predict(request):
+app = Flask(__name__)
+
+@app.route('/api_predict', methods=['GET', 'POST'])
+def api_predict():
     if request.method == 'GET':
         return "Please Send POST Request"
     elif request.method == 'POST':
-        
         data = request.get_json()
+        
+        print("Data sent:" , str(data))
+        
         
         sepal_length = data["sepal_length"]
         sepal_width = data["sepal_width"]
@@ -26,3 +32,4 @@ def api_predict(request):
            
         prediction = model_pk.predict(data)
         return str(prediction)
+
